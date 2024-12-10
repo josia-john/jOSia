@@ -3,6 +3,7 @@ BUILD_DIR = build
 ENTRY_SRC = boot/entry.s
 ENTRY_LIBS = $(wildcard boot/realmode_lib/*.s)
 KERNEL_SRC = kernel/main.c
+KERNEL_DEPENDENCIES = $(wildcard kernel/*.c)		# TODO: exclude main.c??
 KERNEL_LINKER_SCRIPT = kernel/linker.ld
 
 ENTRY_BIN = $(BUILD_DIR)/entry.bin
@@ -23,7 +24,7 @@ $(ENTRY_BIN): $(ENTRY_SRC) $(ENTRY_LIBS)
 	nasm -f bin $(ENTRY_SRC) -o $(ENTRY_BIN)
 
 # Compile the kernel to an object file
-$(KERNEL_OBJ): $(KERNEL_SRC)
+$(KERNEL_OBJ): $(KERNEL_SRC) $(KERNEL_DEPENDENCIES)
 	i386-elf-gcc -ffreestanding -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
 
 # Step 3: Link the C object file into a binary
