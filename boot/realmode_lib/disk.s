@@ -16,7 +16,7 @@ BIOSReadDisk:         ; EDI: disk address (sector), ESI ram address
     align 16
     DAPACK:
         dw 0x10             ; always 0x10 (size of packet)
-        dw 0x1              ; Number of sectors to load
+        dw 0x20              ; Number of sectors to load
         dw 0, 0x7e00 >> 4   ; segment:offset where kernel loaded to.
         dq 1                ; Read from sector 1 (0 indexed) (0x200), that's where the kernel starts.
 

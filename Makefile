@@ -3,7 +3,7 @@ BUILD_DIR = build
 ENTRY_SRC = boot/entry.s
 ENTRY_LIBS = $(wildcard boot/realmode_lib/*.s)
 KERNEL_SRC = kernel/main.c
-KERNEL_DEPENDENCIES = $(wildcard kernel/*.c)		# TODO: exclude main.c??
+KERNEL_DEPENDENCIES = $(wildcard kernel/*/*.c)		# TODO: exclude main.c??
 KERNEL_LINKER_SCRIPT = kernel/linker.ld
 
 ENTRY_BIN = $(BUILD_DIR)/entry.bin
