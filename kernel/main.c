@@ -1,5 +1,5 @@
-#include "lib/lib.c"
-#include "interrupts/interruptHandler.c"
+#include "lib/lib.h"
+#include "interrupts/interrupts.h"
 
 char* VGA_text = (char*)0xB8000;
 

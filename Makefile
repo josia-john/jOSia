@@ -1,36 +1,54 @@
 BUILD_DIR = build
 
-ENTRY_SRC = boot/entry.s
-ENTRY_LIBS = $(wildcard boot/realmode_lib/*.s)
-KERNEL_SRC = kernel/main.c
-KERNEL_DEPENDENCIES = $(wildcard kernel/*/*.c)		# TODO: exclude main.c??
-KERNEL_LINKER_SCRIPT = kernel/linker.ld
+ASM_SRC =	boot/entry.s
+ASM_DEPS =	$(wildcard	boot/realmode_lib/*.s	\
+			)
 
-ENTRY_BIN = $(BUILD_DIR)/entry.bin
-OS_IMG = $(BUILD_DIR)/jOSia
-KERNEL_OBJ = $(BUILD_DIR)/main.o
-KERNEL_BIN = $(BUILD_DIR)/main.bin
+ASM_BIN = ${BUILD_DIR}/entry.bin
+
+C_SRC =		$(wildcard 	kernel/*.c				\
+						kernel/lib/*.c			\
+						kernel/interrupts/*.c	\
+			)
+C_HEADER = 	$(wildcard 	kernel/*.h				\
+						kernel/lib/*.h			\
+						kernel/interrupts/*.h	\
+			)
+
+C_OBJ =		${patsubst %.c, ${BUILD_DIR}/%.o, $(C_SRC)}
+CC = 		i386-elf-gcc
+CFLAGS =	-ffreestanding -c
+
+LINKER_SCRIPT = kernel/linker.ld
+LD =			ld
+LDFLAGS =		-m elf_i386 -Ttext 0x7e00 -T ${LINKER_SCRIPT}
+KERNEL_BIN = 	${BUILD_DIR}/kernel.bin
+
+IMAGE =			${BUILD_DIR}/jOSia
 
 
-# Default target
-all: $(OS_IMG)
+all: ${IMAGE}
 
-$(OS_IMG): $(ENTRY_BIN) $(KERNEL_BIN)
-	cat $(ENTRY_BIN) > $(OS_IMG)
-	cat $(KERNEL_BIN) >> $(OS_IMG)
+${IMAGE}: ${ASM_BIN} ${KERNEL_BIN}
+	mkdir -p ${BUILD_DIR}
+	cat $(ASM_BIN) > $(IMAGE)
+	cat $(KERNEL_BIN) >> $(IMAGE)
 
-# Assemble the entry code using NASM, and 
-$(ENTRY_BIN): $(ENTRY_SRC) $(ENTRY_LIBS)
-	nasm -f bin $(ENTRY_SRC) -o $(ENTRY_BIN)
+${ASM_BIN}: ${ASM_SRC} ${ASM_DEPS}
+	mkdir -p ${BUILD_DIR}
+	nasm -f bin $(ASM_SRC) -o $(ASM_BIN)
 
-# Compile the kernel to an object file
-$(KERNEL_OBJ): $(KERNEL_SRC) $(KERNEL_DEPENDENCIES)
-	i386-elf-gcc -ffreestanding -c $(KERNEL_SRC) -o $(KERNEL_OBJ)
+${KERNEL_BIN}: ${C_OBJ}
+	${LD} ${LDFLAGS} ${C_OBJ} -o ${KERNEL_BIN}
 
-# Step 3: Link the C object file into a binary
-$(KERNEL_BIN): $(KERNEL_OBJ) $(KERNEL_LINKER_SCRIPT)
-	ld -m elf_i386 -Ttext 0x7e00 -T $(KERNEL_LINKER_SCRIPT) $(KERNEL_OBJ) -o $(KERNEL_BIN)
+${BUILD_DIR}/%.o: %.c ${C_HEADER}
+	mkdir -p ${dir $@}
+	${CC} ${CFLAGS} $< -o $@
 
-# Clean up build artifacts
+
+run: ${IMAGE}
+	qemu-system-x86_64 ${IMAGE}
+
+
 clean:
-	rm -f $(OS_IMG) $(ENTRY_BIN) $(KERNEL_BIN) $(KERNEL_OBJ)
+	rm -rf build
