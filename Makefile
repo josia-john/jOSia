@@ -30,24 +30,24 @@ IMAGE =			${BUILD_DIR}/jOSia
 all: ${IMAGE}
 
 ${IMAGE}: ${ASM_BIN} ${KERNEL_BIN}
-	mkdir -p ${BUILD_DIR}
+	@mkdir -p ${BUILD_DIR}
 	cat $(ASM_BIN) > $(IMAGE)
 	cat $(KERNEL_BIN) >> $(IMAGE)
 
 ${ASM_BIN}: ${ASM_SRC} ${ASM_DEPS}
-	mkdir -p ${BUILD_DIR}
+	@mkdir -p ${BUILD_DIR}
 	nasm -f bin $(ASM_SRC) -o $(ASM_BIN)
 
 ${KERNEL_BIN}: ${C_OBJ}
 	${LD} ${LDFLAGS} ${C_OBJ} -o ${KERNEL_BIN}
 
 ${BUILD_DIR}/%.o: %.c ${C_HEADER}
-	mkdir -p ${dir $@}
+	@mkdir -p ${dir $@}
 	${CC} ${CFLAGS} $< -o $@
 
 
 run: ${IMAGE}
-	qemu-system-x86_64 ${IMAGE}
+	qemu-system-x86_64 -drive format=raw,file=${IMAGE}
 
 
 clean:
