@@ -1,5 +1,6 @@
 #include "PIC.h"
 #include "../lib/lib.h"
+#include "../drivers/keyboard.h"
 
 
 void PIC_remap(char offset1, char offset2) {
@@ -49,18 +50,33 @@ void irq_systimer() {
 }
 
 
-// IRQ generic handler, BROW error
+void irq_keyboard() {
+	char buf[2];
+	char buf2[10];
+	intToStr(systimer_tick, buf2);
+	buf[0] = read_character_from_keyboard(); buf[1]=0;
+	printString(buf, 0xF, (char*)(0xB8000+10*160));
+	printString(buf2, 0xF, (char*)(0xB8000+10*160+10));
+	printString("KEYBOARD IRQ handler; keycode, systimer printed above;", 0xF, (char*)(0xB8000+11*160));
+}
+
+
+// IRQ handler
 void irq_generic_c(int irq_number) {
-    if (irq_number==0) {
-		irq_systimer();
-	}
-	else {
-		char buf[10];
-		intToStr(irq_number, buf);
-		printString("                                                                                ", 0x60, (char*)(0xB8000+17*160));
-		printString("                                                                                ", 0x60, (char*)(0xB8000+18*160));
-		printString(buf, 0x6F, (char*)(0xB8000+17*160));
-		printString("generic IRQ handler; irq-number printed above;", 0x6F, (char*)(0xB8000+18*160));
+    switch (irq_number) {
+		case 0:
+			irq_systimer();
+			break;
+		case 1:
+			irq_keyboard();
+			break;
+		default:
+			char buf[10];
+			intToStr(irq_number, buf);
+			printString("                                                                                ", 0x60, (char*)(0xB8000+17*160));
+			printString("                                                                                ", 0x60, (char*)(0xB8000+18*160));
+			printString(buf, 0x6F, (char*)(0xB8000+17*160));
+			printString("generic IRQ handler; irq-number printed above;", 0x6F, (char*)(0xB8000+18*160));
     }
 
     PIC_sendEOI(irq_number);

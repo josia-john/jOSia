@@ -1,5 +1,7 @@
 #include "lib/lib.h"
 #include "interrupts/interrupts.h"
+#include "drivers/keyboard.h"
+#include "paging/paging.h"
 
 char* VGA_text = (char*)0xB8000;
 
@@ -12,9 +14,20 @@ int main() {
 
     initIDT();
 
+    *((char*)0x800000) = 15;
+
+    initialize_paging();
+
+
+    char res = *((char*)0x400000);
+
+    char buf[10];
+    intToStr(res, buf);
+    printString(buf, 0xF, VGA_text+500);
+
+    // __asm__ volatile ("int $0x1");
     
 
-    // __asm__ volatile ("int $0x21");
 
     // int x = 3/0;
     // char buf[10];

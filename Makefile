@@ -9,10 +9,14 @@ ASM_BIN = ${BUILD_DIR}/entry.bin
 C_SRC =		$(wildcard 	kernel/*.c				\
 						kernel/lib/*.c			\
 						kernel/interrupts/*.c	\
+						kernel/drivers/*.c	\
+						kernel/paging/*.c	\
 			)
 C_HEADER = 	$(wildcard 	kernel/*.h				\
 						kernel/lib/*.h			\
 						kernel/interrupts/*.h	\
+						kernel/drivers/*.h	\
+						kernel/paging/*.h	\
 			)
 
 C_OBJ =		${patsubst %.c, ${BUILD_DIR}/%.o, $(C_SRC)}
@@ -56,6 +60,10 @@ ${BUILD_DIR}/%.o: %.s ${C_HEADER}
 
 run: ${IMAGE}
 	qemu-system-x86_64 -drive format=raw,file=${IMAGE}
+
+
+debug: ${IMAGE}
+	qemu-system-x86_64 -drive format=raw,file=${IMAGE} -s -S
 
 
 clean:
