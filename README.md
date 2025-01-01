@@ -25,4 +25,4 @@ Features that would be next:
 
 If you flash jOSia onto a USB, you can boot from it using legacy BIOS.
 
-To build use `make`, to test using QEMU use `make run`. (For dependencies see `Makefile`.)
+To build use `make`, to test using QEMU use `make run`. (For dependencies see `Makefile` and `shell.nix`.)
