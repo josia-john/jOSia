@@ -2,9 +2,13 @@
 
 My own and very small "OS".
 
+### Project
+
 This project originated because I wanted to understand what kind of magic goes
 on in a computer when it boots an operating system. I had enough spare time, so
 I just wrote some code which is actually bootable.
+
+### Features
 
 jOSia is far from an actual OS, but here are the things I got running:
 
@@ -22,6 +26,8 @@ Features that would be next:
 - Userspace
 - Shell
 - ...
+
+### Developing / Testing / Building
 
 If you flash jOSia onto a USB, you can boot from it using legacy BIOS.
 
